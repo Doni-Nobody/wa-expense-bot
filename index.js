@@ -140,7 +140,7 @@ async function getSummary(sender) {
   });
   const rows = (res.data.values || []).slice(1); // skip header
 
-  const now = new Date().tolocalestring(en-GB", {timezone: "Asia/Jakarta" });
+  const now = new Date().tolocalestring('en-G', { timeZone: 'Asia/Jakarta' });
   const thisMonth = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
 
   const monthRows = rows.filter((r) => {
