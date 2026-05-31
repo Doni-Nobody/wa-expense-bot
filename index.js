@@ -121,7 +121,7 @@ async function ensureSheetExists() {
 async function appendExpense({ name, amount, category, note, sender }) {
   const now = new Date();
   const tanggal = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  const jam = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  const jam = now.toLocaleTimeString('id-ID', { timezone: "Asia/Jakarta" });
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
