@@ -121,7 +121,7 @@ async function ensureSheetExists() {
 async function appendExpense({ name, amount, category, note, sender }) {
   const now = new Date();
   const tanggal = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  const jam = now.toLocaleTimeString('id-ID', { timezone: "Asia/Jakarta" });
+  const jam = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
@@ -140,7 +140,7 @@ async function getSummary(sender) {
   });
   const rows = (res.data.values || []).slice(1); // skip header
 
-  const now = new Date();
+  const now = new Date().tolocalestring(en-GB", {timezone: "Asia/Jakarta" });
   const thisMonth = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
 
   const monthRows = rows.filter((r) => {
