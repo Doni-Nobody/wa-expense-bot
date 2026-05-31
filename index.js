@@ -11,13 +11,37 @@ app.use(express.json());
 
 const upload = multer({ storage: multer.memoryStorage() });
 
+// ─── Startup validation ────────────────────────────────────
+const REQUIRED_VARS = [
+  'ANTHROPIC_API_KEY',
+  'TWILIO_ACCOUNT_SID',
+  'TWILIO_AUTH_TOKEN',
+  'GOOGLE_SHEET_ID',
+  'GOOGLE_SERVICE_ACCOUNT_JSON',
+];
+const missing = REQUIRED_VARS.filter((v) => !process.env[v]);
+if (missing.length > 0) {
+  console.error('❌ Environment variables belum diisi:', missing.join(', '));
+  console.error('   Isi semua variable di Railway → tab Variables, lalu redeploy.');
+  process.exit(1);
+}
+
+let serviceAccountCredentials;
+try {
+  serviceAccountCredentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+} catch (e) {
+  console.error('❌ GOOGLE_SERVICE_ACCOUNT_JSON bukan JSON yang valid.');
+  console.error('   Pastikan paste seluruh isi file .json tanpa perubahan apapun.');
+  process.exit(1);
+}
+
 // ─── Clients ───────────────────────────────────────────────
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 // Google Sheets auth via service account
 const auth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON),
+  credentials: serviceAccountCredentials,
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 const sheets = google.sheets({ version: 'v4', auth });
@@ -53,7 +77,7 @@ async function askClaude(text, imageBase64, imageMime) {
   content.push({ type: 'text', text: text || 'Ini struk belanja saya, tolong catat semua pengeluarannya.' });
 
   const msg = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-haiku-4-5-20251001',
     max_tokens: 800,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content }],
